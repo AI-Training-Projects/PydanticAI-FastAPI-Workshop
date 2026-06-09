@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta, timezone
 
-from taskflow.utils import slugify, time_ago, truncate, validate_email
+from taskflow.utils import format_task_id, slugify, time_ago, truncate, validate_email
 
 
 def test_slugify():
@@ -34,3 +34,11 @@ def test_truncate():
     assert truncate("short", 100) == "short"
     assert truncate("hello world", 8) == "hello..."
     assert len(truncate("x" * 200, 100)) == 100
+
+
+def test_format_task_id():
+    assert format_task_id(1) == "TASK-001"
+    assert format_task_id(42) == "TASK-042"
+    assert format_task_id(999) == "TASK-999"
+    assert format_task_id(1000) == "TASK-1000"
+    assert format_task_id(0) == "TASK-000"

@@ -43,3 +43,8 @@ def truncate(text: str, max_length: int = 100) -> str:
     if len(text) <= max_length:
         return text
     return text[: max_length - 3] + "..."
+
+
+def format_task_id(number: int) -> str:
+    """Format an integer as a zero-padded task ID like 'TASK-001'."""
+    return f"TASK-{number:03d}"
