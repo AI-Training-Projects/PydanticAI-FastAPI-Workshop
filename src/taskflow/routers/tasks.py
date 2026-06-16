@@ -1,5 +1,7 @@
 """Task management endpoints."""
 
+import logging
+
 from fastapi import APIRouter, HTTPException, Query
 
 from taskflow.database import db
@@ -10,6 +12,8 @@ from taskflow.models import (
     TaskStatus,
     TaskUpdate,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -31,7 +35,13 @@ def list_tasks(
 @router.post("", response_model=Task, status_code=201)
 def create_task(data: TaskCreate) -> Task:
     """Create a new task."""
-    return db.create_task(data)
+    try:
+        task = db.create_task(data)
+    except Exception:
+        logger.exception("Failed to create task with title %r", data.title)
+        raise HTTPException(status_code=500, detail="Failed to create task")
+    logger.info("Created task %s (%r)", task.id, task.title)
+    return task
 
 
 @router.get("/stats")
@@ -52,17 +62,28 @@ def get_task(task_id: str) -> Task:
 @router.patch("/{task_id}", response_model=Task)
 def update_task(task_id: str, data: TaskUpdate) -> Task:
     """Update a task."""
-    task = db.update_task(task_id, data)
+    try:
+        task = db.update_task(task_id, data)
+    except Exception:
+        logger.exception("Failed to update task %s", task_id)
+        raise HTTPException(status_code=500, detail="Failed to update task")
     if task is None:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+    logger.info("Updated task %s", task_id)
     return task
 
 
 @router.delete("/{task_id}", status_code=204)
 def delete_task(task_id: str) -> None:
     """Delete a task."""
-    if not db.delete_task(task_id):
+    try:
+        deleted = db.delete_task(task_id)
+    except Exception:
+        logger.exception("Failed to delete task %s", task_id)
+        raise HTTPException(status_code=500, detail="Failed to delete task")
+    if not deleted:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+    logger.info("Deleted task %s", task_id)
 
 
 @router.post("/{task_id}/assign", response_model=Task)
@@ -72,7 +93,12 @@ def assign_task(task_id: str, assignee: str = Query(...)) -> Task:
     if user is None:
         raise HTTPException(status_code=404, detail=f"User '{assignee}' not found")
 
-    task = db.update_task(task_id, TaskUpdate(assignee=assignee))
+    try:
+        task = db.update_task(task_id, TaskUpdate(assignee=assignee))
+    except Exception:
+        logger.exception("Failed to assign task %s to %r", task_id, assignee)
+        raise HTTPException(status_code=500, detail="Failed to assign task")
     if task is None:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+    logger.info("Assigned task %s to %r", task_id, assignee)
     return task

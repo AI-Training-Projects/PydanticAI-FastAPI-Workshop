@@ -35,3 +35,9 @@ A Python FastAPI task management API used for the Claude Code workshop.
 - Use proper HTTP status codes (201 for create, 204 for delete)
 - Return 404 with detail message for missing resources
 - Use query parameters for filtering, not request body
+
+
+## Error Handling
+- Always use `HTTPException` from FastAPI for error responses
+- Include a `detail` field with a human-readable message
+- Log errors with `import logging; logger = logging.getLogger(__name__)`

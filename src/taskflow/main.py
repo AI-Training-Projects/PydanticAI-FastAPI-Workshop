@@ -1,8 +1,15 @@
 """TaskFlow API - Main application entry point."""
 
+import logging
+
 from fastapi import FastAPI
 
 from taskflow.routers import tasks, users
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s - %(message)s",
+)
 
 app = FastAPI(
     title="TaskFlow API",
