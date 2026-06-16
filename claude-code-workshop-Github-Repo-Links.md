@@ -6,8 +6,6 @@ https://github.com/microsoft/agent-governance-toolkit/tree/main/examples/demos/g
 
 https://github.com/mentu-ai/mentu-hooks/tree/main
 
-https://github.com/orgs/AI-Training-Projects/teams/ntai_2026q2_training
-
 https://www.google.com/search?client=firefox-b-1-d&q=hermes+desktop+nousresearch+github.com+
 
 https://github.com/nousresearch/hermes-agent
